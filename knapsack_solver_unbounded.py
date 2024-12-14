@@ -9,8 +9,8 @@ class KnapsackUnbounded:
     def __init__(self, items, capacity):
         self.items = items  # List of tuples (weight, value)
         self.capacity = capacity
-        self.genome_size = len(items)  # Number of items determines genome size
-        
+        self.genome_size = len(items)
+
     def fitness(self, genome: list) -> float:
         total_weight = 0
         total_value = 0
@@ -35,14 +35,13 @@ class KnapsackUnbounded:
         return child
     
     def mutate(self, genome: Genome, mutation_rate: float) -> Genome:
-        # Mutation alters the count of items with probability mutation_rate
         for i in range(self.genome_size):
             if random.random() < mutation_rate:
-                # Randomly increase or decrease the count within feasible limits
+                # mutate the genes
                 genome[i] = max(0, genome[i] + random.choice([-1, 1]))
         return genome
     
-    def select_parent(self, population: Population, fitness_function: Fitness, tournament_size: int = 3) -> Genome:
+    def select_parent(self, population: Population, fitness_function: Fitness, tournament_size: int = 2) -> Genome:
         # Tournament selection: select the best genome from a random subset of the population
         tournament = random.sample(population, tournament_size)
         tournament_fitness = [fitness_function(genome) for genome in tournament]
@@ -55,17 +54,11 @@ class KnapsackUnbounded:
         for _ in range(generations):
             new_population = []
             for _ in range(population_size):
-                # Select two parents using tournament selection
                 parent1 = self.select_parent(population, self.fitness)
                 parent2 = self.select_parent(population, self.fitness)
 
-                #create a new genome
                 new_genome = self.crossover(parent1=parent1, parent2=parent2)
-                
-                #mutate the genome
                 new_genome = self.mutate(new_genome, mutation_rate)
-                
-                # Add the new  to the new population
                 new_population.append(new_genome)
                 
             population = new_population

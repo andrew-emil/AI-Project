@@ -9,7 +9,6 @@ class KnapsackGUI:
         self.root = root
         self.root.title("Knapsack Problem Solver")
 
-        # Dark theme colors
         self.bg_color = "#2c2c2c"
         self.fg_color = "#ffffff"
         self.button_color = "#444444"
@@ -20,7 +19,7 @@ class KnapsackGUI:
         self.root.configure(bg=self.bg_color)
 
         # Data containers
-        self.entries = []  # Stores the weight and value entries for all items
+        self.entries = []
 
         # Labels and entry fields for number of items and capacity
         tk.Label(root, text="Number of items:", bg=self.bg_color, fg=self.fg_color).pack(pady=(10, 0))
@@ -33,19 +32,19 @@ class KnapsackGUI:
 
         # Buttons
         tk.Button(root, text="Generate Tables", bg=self.button_color,padx=5, fg=self.fg_color, activebackground=self.button_hover,
-                  command=self.generate_table).pack(pady=10, padx=5)
+                command=self.generate_table).pack(pady=10, padx=5)
 
         self.item_frame = tk.Frame(root, bg=self.bg_color, padx=10, pady=10)
         self.item_frame.pack()
 
         # Quit button
         tk.Button(root, text="Quit", bg="#aa3333",fg=self.fg_color, activebackground="#bb4444",
-                  command=self.close_window, padx=7).pack(pady=10, padx=7)
+                command=self.close_window, padx=7).pack(pady=10, padx=7)
 
         self.solution_frame = tk.Frame(root, bg=self.bg_color, padx=15, pady=10)
         self.solution_frame.pack()
 
-        self.root.mainloop()  # Ensures GUI is displayed
+        self.root.mainloop()
 
     def generate_table(self):
         num_items = self.validate_data(self.num_items_entry.get(), "Number of items")
@@ -72,7 +71,6 @@ class KnapsackGUI:
             # Append weight and value entries to the list
             self.entries.append((weight_entry, value_entry))
 
-        # Add "Calculate" button at the bottom
         calculate_button = tk.Button(
             self.item_frame, text="Calculate", bg=self.button_color, fg=self.fg_color, activebackground=self.button_hover,
             command=self.calculate
@@ -86,7 +84,6 @@ class KnapsackGUI:
         if num_items is None or capacity is None:
             return
 
-        # Validate weights and values
         items = []
         for i, (weight_entry, value_entry) in enumerate(self.entries):
             weight = self.validate_data(weight_entry.get(), f"Weight of item {i + 1}")
@@ -106,6 +103,7 @@ class KnapsackGUI:
         self.display_solution(solution_0_1, solution_unbounded)
 
     def display_solution(self, solution_0_1, solution_unbounded):
+        solutionMsg = ""
         # Clear previous content in the solution frame
         for widget in self.solution_frame.winfo_children():
             widget.destroy()
@@ -115,24 +113,31 @@ class KnapsackGUI:
         ttk.Separator(self.solution_frame, orient='vertical').grid(row=0, column=1, rowspan=10, sticky="ns", padx=10)
         tk.Label(self.solution_frame, text="Knapsack Unbounded", font=("Arial", 14, "bold"), bg=self.bg_color, fg=self.fg_color).grid(row=0, column=2, padx=10, pady=10)
 
+        for i in range(len(solution_0_1[0])):
+            solutionMsg += f"item {i+1} : {solution_0_1[0][i]}\n"
+
         # Knapsack 0/1 Solution
         tk.Label(self.solution_frame, text="Best Profit:", bg=self.bg_color, fg=self.fg_color).grid(row=1, column=0, sticky="w", padx=10)
         tk.Label(self.solution_frame, text=str(solution_0_1[1]), bg=self.bg_color, fg=self.fg_color).grid(row=2, column=0, sticky="w", padx=10)
 
         tk.Label(self.solution_frame, text="Best Solution:", bg=self.bg_color, fg=self.fg_color).grid(row=3, column=0, sticky="w", padx=10)
-        tk.Label(self.solution_frame, text=str(solution_0_1[0]), bg=self.bg_color, fg=self.fg_color).grid(row=4, column=0, sticky="w", padx=10)
+        tk.Message(self.solution_frame, text=solutionMsg, bg=self.bg_color, fg=self.fg_color).grid(row=4, column=0, sticky="w", padx=10)
+        
+        solutionMsg = ""
+        for i in range(len(solution_unbounded[0])):
+            solutionMsg += f"item {i+1} : {solution_unbounded[0][i]}\n"
 
         # Knapsack Unbounded Solution
         tk.Label(self.solution_frame, text="Best Profit:", bg=self.bg_color, fg=self.fg_color).grid(row=1, column=2, sticky="w", padx=10)
         tk.Label(self.solution_frame, text=str(solution_unbounded[1]), bg=self.bg_color, fg=self.fg_color).grid(row=2, column=2, sticky="w", padx=10)
 
         tk.Label(self.solution_frame, text="Best Solution:", bg=self.bg_color, fg=self.fg_color).grid(row=3, column=2, sticky="w", padx=10)
-        tk.Label(self.solution_frame, text=str(solution_unbounded[0]), bg=self.bg_color, fg=self.fg_color).grid(row=4, column=2, sticky="w", padx=10)
+        tk.Message(self.solution_frame, text=solutionMsg, bg=self.bg_color, fg=self.fg_color).grid(row=4, column=2, sticky="w", padx=10)
 
     def validate_data(self, data, field_name):
         try:
             num = int(data)
-            if num < 0:
+            if num <= 0:
                 raise ValueError
             return num
         except ValueError:
