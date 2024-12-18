@@ -46,20 +46,18 @@ class KnapsackGA01:
 
     def select_parent(self, population: Population, fitness_function: Fitness, tournament_size: int = 2) -> Genome:
         # Tournament selection: select the best genome from a random subset of the population
-        tournament = random.sample(population, tournament_size)
-        tournament_fitness = [fitness_function(genome) for genome in tournament]
-        winner_index = tournament_fitness.index(max(tournament_fitness))
-        return tournament[winner_index]
-    
+        tournament = random.sample(population, k=tournament_size)
+        return max(tournament, key=fitness_function)
+
     def evolution(self, generations: int, population_size: int, mutation_rate: float) -> Genome:
         population = self.generate_population(population_size)
         
         for _ in range(generations):
             new_population = []
+            elite = max(population, key=self.fitness)
+            new_population.append(elite)
             for _ in range(population_size):
-                parent1 = self.select_parent(population, self.fitness)
-                parent2 = self.select_parent(population, self.fitness)
-
+                parent1, parent2 = self.select_parent(population, self.fitness), self.select_parent(population, self.fitness)
                 new_genome = self.crossover(parent1=parent1, parent2=parent2)
                 new_genome = self.mutate(new_genome, mutation_rate)
                 new_population.append(new_genome)

@@ -8,98 +8,108 @@ class KnapsackGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Knapsack Problem Solver")
+        self.root.minsize(600, 400)
 
+        # Define color scheme
         self.bg_color = "#2c2c2c"
         self.fg_color = "#ffffff"
         self.button_color = "#444444"
         self.button_hover = "#666666"
-        self.highlight_color = "#888888"
+        self.error_color = "#aa3333"
+        self.success_color = "#33aa33"
 
-        # Configure the root window
         self.root.configure(bg=self.bg_color)
-
-        # Data containers
         self.entries = []
-
-        # Labels and entry fields for number of items and capacity
-        tk.Label(root, text="Number of items:", bg=self.bg_color, fg=self.fg_color).pack(pady=(10, 0))
-        self.num_items_entry = tk.Entry(root, bg=self.button_color, fg=self.fg_color, insertbackground=self.fg_color)
-        self.num_items_entry.pack()
-
-        tk.Label(root, text="Capacity:", bg=self.bg_color, fg=self.fg_color).pack(pady=(10, 0))
-        self.capacity_entry = tk.Entry(root, bg=self.button_color, fg=self.fg_color, insertbackground=self.fg_color)
-        self.capacity_entry.pack()
-
-        # Buttons
-        tk.Button(root, text="Generate Tables", bg=self.button_color,padx=5, fg=self.fg_color, activebackground=self.button_hover,
-                command=self.generate_table).pack(pady=10, padx=5)
-
-        self.item_frame = tk.Frame(root, bg=self.bg_color, padx=10, pady=10)
-        self.item_frame.pack()
-
-        # Quit button
-        tk.Button(root, text="Quit", bg="#aa3333",fg=self.fg_color, activebackground="#bb4444",
-                command=self.close_window, padx=7).pack(pady=10, padx=7)
-
-        self.solution_frame = tk.Frame(root, bg=self.bg_color, padx=15, pady=10)
-        self.solution_frame.pack()
-
+        self.create_widgets()
         self.root.mainloop()
 
+    def create_widgets(self):
+        """Create main widgets for the GUI."""
+        # Header Label
+        header_label = tk.Label(self.root, text="Knapsack Problem Solver", font=("Arial", 16, "bold"),
+                                bg=self.bg_color, fg=self.fg_color)
+        header_label.pack(pady=10)
+
+        # Inputs for number of items and capacity
+        input_frame = tk.Frame(self.root, bg=self.bg_color)
+        input_frame.pack(pady=10)
+
+        tk.Label(input_frame, text="Number of Items:", bg=self.bg_color, fg=self.fg_color).grid(row=0, column=0, padx=5)
+        self.num_items_entry = tk.Entry(input_frame, bg=self.button_color, fg=self.fg_color, insertbackground=self.fg_color)
+        self.num_items_entry.grid(row=0, column=1, padx=5)
+
+        tk.Label(input_frame, text="Capacity:", bg=self.bg_color, fg=self.fg_color).grid(row=1, column=0, padx=5)
+        self.capacity_entry = tk.Entry(input_frame, bg=self.button_color, fg=self.fg_color, insertbackground=self.fg_color)
+        self.capacity_entry.grid(row=1, column=1, padx=5)
+
+        # Buttons
+        button_frame = tk.Frame(self.root, bg=self.bg_color)
+        button_frame.pack(pady=10)
+
+        tk.Button(button_frame, text="Generate Tables", bg=self.button_color, fg=self.fg_color,
+                activebackground=self.button_hover, command=self.generate_table).pack(side="left", padx=5)
+        tk.Button(button_frame, text="Quit", bg=self.error_color, fg=self.fg_color,
+                activebackground="#bb4444", command=self.close_window).pack(side="right", padx=5)
+
+        # Frame for dynamically added item entries
+        self.item_frame = tk.Frame(self.root, bg=self.bg_color)
+        self.item_frame.pack(pady=10)
+
+        # Frame for displaying solutions
+        self.solution_frame = tk.Frame(self.root, bg=self.bg_color)
+        self.solution_frame.pack(pady=10)
+
     def generate_table(self):
-        num_items = self.validate_data(self.num_items_entry.get(), "Number of items")
+        """Generate input fields for item weights and values."""
+        num_items = self.validate_data(self.num_items_entry.get(), "Number of Items")
         if num_items is None:
             return
 
-        # Clear the item frame
+        # Clear previous entries
         for widget in self.item_frame.winfo_children():
             widget.destroy()
         self.entries.clear()
 
-        # Create weight and value entry fields dynamically
+        # Create input fields for each item
+        tk.Label(self.item_frame, text="Enter Weights and Values:", bg=self.bg_color, fg=self.fg_color,
+                font=("Arial", 12, "bold")).grid(row=0, column=0, columnspan=4, pady=10)
+
         for i in range(num_items):
-            tk.Label(self.item_frame, text=f"Item {i + 1}:", bg=self.bg_color, fg=self.fg_color).grid(row=i, column=0, padx=5, pady=5, sticky="w")
-
-            tk.Label(self.item_frame, text="Weight:", bg=self.bg_color, fg=self.fg_color).grid(row=i, column=1, padx=5)
+            tk.Label(self.item_frame, text=f"Item {i + 1}:", bg=self.bg_color, fg=self.fg_color).grid(row=i + 1, column=0, padx=5)
+            tk.Label(self.item_frame, text="Weight:", bg=self.bg_color, fg=self.fg_color).grid(row=i + 1, column=1, padx=5)
             weight_entry = tk.Entry(self.item_frame, bg=self.button_color, fg=self.fg_color, insertbackground=self.fg_color)
-            weight_entry.grid(row=i, column=2, padx=5)
+            weight_entry.grid(row=i + 1, column=2, padx=5)
 
-            tk.Label(self.item_frame, text="Value:", bg=self.bg_color, fg=self.fg_color).grid(row=i, column=3, padx=5)
+            tk.Label(self.item_frame, text="Value:", bg=self.bg_color, fg=self.fg_color).grid(row=i + 1, column=3, padx=5)
             value_entry = tk.Entry(self.item_frame, bg=self.button_color, fg=self.fg_color, insertbackground=self.fg_color)
-            value_entry.grid(row=i, column=4, padx=5)
+            value_entry.grid(row=i + 1, column=4, padx=5)
 
-            # Append weight and value entries to the list
+            # Store weight and value entry fields
             self.entries.append((weight_entry, value_entry))
 
-        calculate_button = tk.Button(
-            self.item_frame, text="Calculate", bg=self.button_color, fg=self.fg_color, activebackground=self.button_hover,
-            command=self.calculate
-        )
-        calculate_button.grid(row=num_items, column=0, columnspan=5, pady=10, sticky="ew")
+        # Add Calculate Button
+        tk.Button(self.item_frame, text="Calculate", bg=self.success_color, fg=self.fg_color,
+                activebackground="#55aa55", command=self.calculate).grid(row=num_items + 1, column=0, columnspan=5, pady=10)
 
     def calculate(self):
-        # Validate the number of items and capacity
-        num_items = self.validate_data(self.num_items_entry.get(), "Number of items")
+        """Calculate solutions for the knapsack problem."""
+        num_items = self.validate_data(self.num_items_entry.get(), "Number of Items")
         capacity = self.validate_data(self.capacity_entry.get(), "Capacity")
         if num_items is None or capacity is None:
             return
 
         items = []
         for i, (weight_entry, value_entry) in enumerate(self.entries):
-            weight = self.validate_data(weight_entry.get(), f"Weight of item {i + 1}")
-            value = self.validate_data(value_entry.get(), f"Value of item {i + 1}")
+            weight = self.validate_data(weight_entry.get(), f"Weight of Item {i + 1}")
+            value = self.validate_data(value_entry.get(), f"Value of Item {i + 1}")
             if weight is None or value is None:
                 return
             items.append((weight, value))
 
-        # Solve Knapsack problems
-        knapsack_ga_01 = KnapsackGA01(items, capacity)
-        knapsack_unbounded = KnapsackUnbounded(items, capacity)
+        # Solve Knapsack problem (0/1 and Unbounded)
+        solution_0_1 = self.solve_knapsack_01(items, capacity)
+        solution_unbounded = self.solve_knapsack_unbounded(items, capacity)
 
-        solution_0_1 = knapsack_ga_01.evolution(generations=100, population_size=50, mutation_rate=0.01)
-        solution_unbounded = knapsack_unbounded.evolution(generations=200, population_size=75, mutation_rate=0.001)
-
-        # Display solutions
         self.display_solution(solution_0_1, solution_unbounded)
 
     def display_solution(self, solution_0_1, solution_unbounded):
@@ -135,18 +145,28 @@ class KnapsackGUI:
         tk.Message(self.solution_frame, text=solutionMsg, bg=self.bg_color, fg=self.fg_color).grid(row=4, column=2, sticky="w", padx=10)
 
     def validate_data(self, data, field_name):
+        """Validate input data as a positive integer."""
         try:
-            num = int(data)
-            if num <= 0:
+            value = int(data)
+            if value <= 0:
                 raise ValueError
-            return num
+            return value
         except ValueError:
-            messagebox.showerror("ERROR", f"Invalid input for {field_name}: Please enter a valid positive integer")
+            messagebox.showerror("Input Error", f"Invalid input for {field_name}. Please enter a positive integer.")
             return None
+
+    def solve_knapsack_01(self, items, capacity):
+        obj = KnapsackGA01(items, capacity)
+        result = obj.evolution(generations=200, population_size=100, mutation_rate=0.01)
+        return result
+
+    def solve_knapsack_unbounded(self, items, capacity):
+        obj = KnapsackUnbounded(items, capacity)
+        result = obj.evolution(generations=200, population_size=100, mutation_rate=0.01)
+        return result
 
     def close_window(self):
         self.root.destroy()
-
 
 #Main application
 if __name__ == "__main__":
