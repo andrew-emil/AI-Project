@@ -11,6 +11,7 @@ class KnapsackGA01:
         self.items = items  # List of tuples (weight, value)
         self.capacity = capacity
         self.genome_size = len(items)
+        self.fitness_values = []
 
     def fitness(self, genome: list) -> float:
         total_weight = 0
@@ -56,6 +57,9 @@ class KnapsackGA01:
             new_population = []
             elite = max(population, key=self.fitness)
             new_population.append(elite)
+            # print(elite)
+            best_fitness = self.fitness(elite)
+            self.fitness_values.append(best_fitness)
             for _ in range(population_size):
                 parent1, parent2 = self.select_parent(population, self.fitness), self.select_parent(population, self.fitness)
                 new_genome = self.crossover(parent1=parent1, parent2=parent2)
@@ -67,4 +71,4 @@ class KnapsackGA01:
         # Return the best solution from the final population
         best_genome = max(population, key=self.fitness)
         best_profit = self.fitness(best_genome)
-        return [best_genome, best_profit]
+        return [best_genome, best_profit, self.fitness_values]

@@ -1,8 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+
+import numpy as np
 from knapsack_solver_0_1 import KnapsackGA01
 from knapsack_solver_unbounded import KnapsackUnbounded
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 class KnapsackGUI:
     def __init__(self, root):
@@ -109,10 +114,45 @@ class KnapsackGUI:
         # Solve Knapsack problem (0/1 and Unbounded)
         solution_0_1 = self.solve_knapsack_01(items, capacity)
         solution_unbounded = self.solve_knapsack_unbounded(items, capacity)
+        
+        
+        fitness_values_01 = solution_0_1[-1]
+        fitness_values_unbounded = solution_unbounded[-1]
+        # last_200_fitness_values_01 = fitness_values_01[-200:]
+        # last_200_fitness_values_unbounded = fitness_values_unbounded[-200:]
+        
 
-        self.display_solution(solution_0_1, solution_unbounded)
+        self.display_solution(solution_0_1, solution_unbounded, fitness_values_01=fitness_values_01, fitness_values_unbounded=fitness_values_unbounded)
+        
+    def create_plots(self, fitness_01_values, fitness_unbounded_values):
+        # Simulate data for plots
+        generations = range(1, 201)
 
-    def display_solution(self, solution_0_1, solution_unbounded):
+        # Create fitness progress plot
+        plt.figure(figsize=(10, 6))
+        plt.plot(generations, fitness_01_values, label="Knapsack 0/1", color="blue")
+        plt.plot(generations, fitness_unbounded_values, label="Knapsack Unbounded", color="green")
+        plt.title("Fitness Progress Over Generations")
+        plt.xlabel("Generations")
+        plt.ylabel("Fitness Value")
+        plt.legend()
+        plt.grid(True)
+        plt.savefig("fitness_progress.png")
+
+        # Simulate data for execution time
+        algorithms = ["Knapsack 0/1", "Knapsack Unbounded"]
+        execution_time = [1.5, 2.3]  # in seconds
+
+        # Create execution time comparison bar chart
+        plt.figure(figsize=(8, 5))
+        plt.bar(algorithms, execution_time, color=["blue", "green"])
+        plt.title("Execution Time Comparison")
+        plt.ylabel("Time (seconds)")
+        plt.grid(axis="y", linestyle="--", alpha=0.7)
+        plt.savefig("execution_time_comparison.png")
+
+    def display_solution(self, solution_0_1, solution_unbounded,fitness_values_01,  fitness_values_unbounded):
+        self.create_plots(fitness_01_values=fitness_values_01, fitness_unbounded_values=fitness_values_unbounded)
         solutionMsg = ""
         # Clear previous content in the solution frame
         for widget in self.solution_frame.winfo_children():

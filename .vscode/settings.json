@@ -3,10 +3,15 @@
 		"activebackground",
 		"activeforeground",
 		"columnspan",
+		"figsize",
 		"insertbackground",
+		"linestyle",
 		"padx",
 		"pady",
 		"rowspan",
-		"royalblue"
+		"royalblue",
+		"tkagg",
+		"xlabel",
+		"ylabel"
 	]
 }
